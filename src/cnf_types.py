@@ -19,6 +19,14 @@ class CNF_Solver():
         self.expression_types = list()
         self.num_literals = list()
         self.num_clauses = list()
+        self.horn_results = [len(self.expressions)]*-1
+        self.two_results = [len(self.expressions)]*-1
+        self.N_results = [len(self.expressions)]*-1
+        self.SAT_result = list() #NOTE: No actual results stored here. it's just a 1 if an assigment was found, else 0
+        self.timing_results = list()
+        self.horns = list()
+        self.twos = list()
+        self.Ns = list()
         for line in self.cnf_file:
             #print line
             expression, num_literals = self.parse_cnf(line)
@@ -26,8 +34,8 @@ class CNF_Solver():
             self.num_clauses.append(len(expression))
             self.num_literals.append(num_literals)
             self.expression_types.append(self.determine_type(expression))
-        self.timing_results = list()
-    	self.SAT_result = list()
+        
+    	
         
         #for cnf in self.expressions:
             #print cnf
@@ -61,7 +69,7 @@ class CNF_Solver():
         if horn:
             types += cnf[1]
         if len(lengths) > 1:
-            print types
+            #print types
             return types
         elif 2 in lengths:
             types += cnf[2]
@@ -84,17 +92,43 @@ class CNF_Solver():
             self.timing_results.append(time)
             
 
-
-
     def general_SAT_solve(self, expression):
         return general_solve(expression)
 
-    def get_pretty_results(self):
-        #self.
-        #for expression in self.expressions:
-        return None
+    def get_new_list(self, ori_list, indexes):
+        new_list = list()
+        for i in indexes:
+            new_list.append(ori_list[i])
+        return new_list
 
     def optimized_solve_all(self):
-        return None
+        for index, expression in enumerate(self.expressions):
+            if 'horn' in self.expression_types[index]:
+                self.solve_horn(index)
+            if 'two' in self.expression_types[index]:
+                self.solve_two_SAT(index)
+            elif 'N' in self.expression_types[index]:
+                self.solve_N_SAT(index)
+        return
 
+    def solve_horn(self, index):
+        self.horns.append(index)
+        begin_time = datetime.datetime.now()
+        #computation
+        self.horn_results[index] = ((datetime.datetime.now()-begin_time).total_seconds())
+        return
+
+    def solve_two_SAT(self, index):
+        self.twos.append(index)
+        begin_time = datetime.datetime.now()
+        #computation
+        self.two_results[index] = ((datetime.datetime.now()-begin_time).total_seconds())
+        return
+
+    def solve_N_SAT(self, index):
+        self.Ns.append(index)
+        begin_time = datetime.datetime.now()
+        #computation
+        self.N_results[index] = ((datetime.datetime.now()-begin_time).total_seconds())
+        return
 	
