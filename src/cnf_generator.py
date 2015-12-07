@@ -1,25 +1,21 @@
-
+#random cnf clause generator
 
 import random
 import os
 
-alpha = ['a','b','c','d']
 
-print "Number of cnf expressions to generate:"
-num_cnf = 100
+alpha = ['a','b','c','d', 'e', 'f', 'g', 'h', 'i','j','k','l','m']
 
-print "Max clause length:"
-max_clause_len = 4
 
-print "Min clause length"
-min_clause_len = 2
 
-print "Max number of clauses per expression:"
-max_num_clauses = 10
+num_cnf =  input("Number of cnf expressions to generate: ")
+max_clause_len =  input("Max clause length: ")
+min_clause_len =  input("Min clause length: ")
+max_num_clauses  =  input("Max number of clauses per expression: ")
+if(max_clause_len > 12): max_clause_len = 12 #add more characters to alpha if you want longer clauses
 
-print "Filename to print to:"
-filename = "cnf_expressions.txt"
-path = os.path.join(filename)
+filename  =  "cnf_expressions"
+path = os.path.join(filename) + ".txt"
 output_file = open(path, 'w')
 
 for i in range(num_cnf):
