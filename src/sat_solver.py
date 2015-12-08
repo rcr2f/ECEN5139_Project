@@ -29,13 +29,13 @@ def horn_solve(expression):
     expression = remove_redundancies(expression)
     instance = SATInstance(expression)
 
-    result = assign_all_true(instance, verbose)
+    result = assign_all_false(instance, verbose)
 
     if result == False and verbose:
         print('No satisfying assignment exists.')
     return result
 
-def assign_all_true(expression, verbose):
+def assign_all_false(expression, verbose):
     n = len(expression.variables)
     watchlist = setup_watchlist(expression)
     if not watchlist:
@@ -54,7 +54,7 @@ def final_horn_check(instance, watchlist, assignment, d, verbose):
         # Let's try assigning a value to v. Here would be the place to insert
         # heuristics of which value to try first.
         tried_something = False
-        for a in [1]:
+        for a in [0]:
             if (state[d] >> a) & 1 == 0:
                 if verbose:
                     print('Trying {} = {}'.format(instance.variables[d], a))
@@ -84,7 +84,7 @@ def two_SAT_solve(expression):
     expression = remove_redundancies(expression)
     instance = SATInstance(expression)
 
-    result = assign_all_true(instance, verbose)
+    result = assign_all_false(instance, verbose)
 
     if result == False and verbose:
         print('No satisfying assignment exists.')
@@ -95,7 +95,7 @@ def N_SAT_solve(expression):
     expression = remove_redundancies(expression)
     instance = SATInstance(expression)
 
-    result = assign_all_true(instance, verbose)
+    result = assign_all_false(instance, verbose)
 
     if result == False and verbose:
         print('No satisfying assignment exists.')
