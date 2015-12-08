@@ -4,7 +4,7 @@ from optparse import OptionParser
 import os
 from cnf_types import CNF_Solver
 import matplotlib.pyplot as plt
-
+import operator
 
 
 
@@ -31,7 +31,6 @@ if __name__ == '__main__':
     solver.general_solve_all()
     solver.optimized_solve_all()
     
-    '''
     plt.plot(solver.timing_results)
     plt.title('General SAT results: overall time')
     plt.ylabel('General Solve Time')
@@ -49,6 +48,35 @@ if __name__ == '__main__':
     plt.ylabel('General Solve Time')
     plt.xlabel('Number of clauses per expression')
     plt.show()
-    '''
+
+    horn_times = solver.get_new_list(solver.horn_results, solver.horns)
+    general_times_1 = solver.get_new_list(solver.timing_results, solver.horns)
+    two_times = solver.get_new_list(solver.two_results, solver.twos)
+    general_times_2 = solver.get_new_list(solver.timing_results, solver.twos) 
+    N_times = solver.get_new_list(solver.N_results, solver.Ns)
+    general_times_3 = solver.get_new_list(solver.timing_results, solver.Ns)
+
+    horn_difference = map(operator.sub, general_times_1, horn_times)
+    two_difference = map(operator.sub, general_times_2, two_times)
+    N_difference = map(operator.sub, general_times_3, N_times)
+
+    plt.plot(horn_difference,  'bo')
+    plt.title('Horn Solve results')
+    plt.ylabel('Difference in Solve Time')
+    plt.xlabel('Expression')
+    plt.show()
+
+    plt.plot(two_difference,  'bo')
+    plt.title('2-SAT results')
+    plt.ylabel('Difference in Solve Time')
+    plt.xlabel('Expression')
+    plt.show()
+
+    plt.plot(N_difference,  'bo')
+    plt.title('N-SAT Results')
+    plt.ylabel('Difference in Solve Time')
+    plt.xlabel('Expression')
+    plt.show()
+
     
    

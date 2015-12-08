@@ -5,9 +5,7 @@ from collections import deque
 
 verbose = False
 
-'''
-Things to include:
-'''
+
 
 def general_solve(expression):
     expression = remove_redundancies(expression)
@@ -21,27 +19,87 @@ def general_solve(expression):
             print(instance.assignment_to_string(assignment))
         count += 1
 
-    if count == 0:
+    if count == 0 and verbose:
         print('No satisfying assignment exists.')
 
     return count
-'''
 
-class two_SAT(SAT):
+#expression should have been determined to be horn by this point
+def horn_solve(expression):
+    expression = remove_redundancies(expression)
+    instance = SATInstance(expression)
 
-	def __init__(self):
+    result = assign_all_true(instance, verbose)
 
+    if result == False and verbose:
+        print('No satisfying assignment exists.')
+    return result
 
-class horn_SAT(SAT):
+def assign_all_true(expression, verbose):
+    n = len(expression.variables)
+    watchlist = setup_watchlist(expression)
+    if not watchlist:
+        return ()
+    assignment = [None] * n
+    return final_horn_check(expression, watchlist, assignment, 0, verbose)
 
-	def __init__(self):
+def final_horn_check(instance, watchlist, assignment, d, verbose):
+    n = len(instance.variables)
+    state = [0] * n
 
+    while True:
+        if d == n:
+            d -= 1
+            break
+        # Let's try assigning a value to v. Here would be the place to insert
+        # heuristics of which value to try first.
+        tried_something = False
+        for a in [1]:
+            if (state[d] >> a) & 1 == 0:
+                if verbose:
+                    print('Trying {} = {}'.format(instance.variables[d], a))
+                tried_something = True
+                # Set the bit indicating a has been tried for d
+                state[d] |= 1 << a
+                assignment[d] = a
+                if not update_watchlist(instance, watchlist, d << 1 | a, assignment, verbose):
+                    assignment[d] = None
+                else:
+                    d += 1
+                    break
 
-class n_SAT(SAT):
+        if not tried_something:
+            if d == 0:
+                # Can't backtrack further. No solutions.
+                return False
+            else:
+                # Backtrack
+                state[d] = 0
+                assignment[d] = None
+                d -= 1
+    return True
 
-	def __init__(self):
+#expression should be in 2-clause format
+def two_SAT_solve(expression):
+    expression = remove_redundancies(expression)
+    instance = SATInstance(expression)
 
-'''
+    result = assign_all_true(instance, verbose)
+
+    if result == False and verbose:
+        print('No satisfying assignment exists.')
+    return result
+
+#expression should be in N-clause format
+def N_SAT_solve(expression):
+    expression = remove_redundancies(expression)
+    instance = SATInstance(expression)
+
+    result = assign_all_true(instance, verbose)
+
+    if result == False and verbose:
+        print('No satisfying assignment exists.')
+    return result
 
 def remove_redundancies(expression):
     newlist = list()
@@ -109,8 +167,7 @@ def iter_solve(instance, watchlist, assignment, d, verbose):
         for a in [0, 1]:
             if (state[d] >> a) & 1 == 0:
                 if verbose:
-                    print('Trying {} = {}'.format(instance.variables[d], a),
-                          file=stderr)
+                    print('Trying {} = {}'.format(instance.variables[d], a))
                 tried_something = True
                 # Set the bit indicating a has been tried for d
                 state[d] |= 1 << a
